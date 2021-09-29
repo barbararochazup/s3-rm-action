@@ -55,14 +55,8 @@ if [ -n "$ASSUME_ROLE_ARN" ]; then
   fi
 
    aws sts assume-role \
-    --role-session-name=" ${ASSUME_ROLE_SESSION_NAME:-$ASSUME_ROLE_SESSION_TIME}" \
-    --role-arn="$ASSUME_ROLE_ARN" \
-    --output text \
-    --query='Credentials.[
-      join(`=`, [`AWS_ACCESS_KEY_ID`, AccessKeyId]),
-      join(`=`, [`AWS_SECRET_ACCESS_KEY`, SecretAccessKey]),
-      join(`=`, [`AWS_SESSION_TOKEN`, SessionToken])
-    ]'
+    --role-session-name="${ASSUME_ROLE_SESSION_NAME}" \
+    --role-arn="${ASSUME_ROLE_ARN}" 
 fi
 
 
