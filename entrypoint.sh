@@ -54,10 +54,8 @@ if [ -n "$ASSUME_ROLE_ARN" ]; then
     exit 1
   fi
 
-
-  ROLE_SESSION_NAME = ${ASSUME_ROLE_SESSION_NAME:-$ASSUME_ROLE_SESSION_TIME}  
    aws sts assume-role \
-    --role-session-name="$ROLE_SESSION_NAME" \
+    --role-session-name=" ${ASSUME_ROLE_SESSION_NAME:-$ASSUME_ROLE_SESSION_TIME}" \
     --role-arn="$ASSUME_ROLE_ARN" \
     --output text \
     --query='Credentials.[
