@@ -27,6 +27,8 @@ if [ -n "$AWS_S3_ENDPOINT" ]; then
   ENDPOINT_APPEND="--endpoint-url $AWS_S3_ENDPOINT"
 fi
 
+
+
 # Create a dedicated profile for this action to avoid conflicts
 # with past/future actions.
 # https://github.com/jakejarvis/s3-rm-action/issues/1
@@ -36,6 +38,35 @@ ${AWS_SECRET_ACCESS_KEY}
 ${AWS_REGION}
 text
 EOF
+
+
+# Override default AWS endpoint if user sets AWS_S3_ENDPOINT.
+if [ -n "$ASSUME_ROLE_ARN" ]; then
+
+
+  if [ -z "$ASSUME_ROLE_SESSION_NAME" ]; then
+    echo "ASSUME_ROLE_SESSION_NAME is not set. Quitting."
+    exit 1
+  fi
+
+  if [ -z "$ASSUME_ROLE_SESSION_TIME" ]; then
+    echo "ASSUME_ROLE_SESSION_TIME is not set. Quitting."
+    exit 1
+  fi
+
+
+  ROLE_SESSION_NAME = ${ASSUME_ROLE_SESSION_NAME:-$ASSUME_ROLE_SESSION_TIME}  
+   aws sts assume-role \
+    --role-session-name="$ROLE_SESSION_NAME" \
+    --role-arn="$ASSUME_ROLE_ARN" \
+    --output text \
+    --query='Credentials.[
+      join(`=`, [`AWS_ACCESS_KEY_ID`, AccessKeyId]),
+      join(`=`, [`AWS_SECRET_ACCESS_KEY`, SecretAccessKey]),
+      join(`=`, [`AWS_SESSION_TOKEN`, SessionToken])
+    ]'
+fi
+
 
 # Sync using our dedicated profile and suppress verbose messages.
 # All other flags are optional via the `args:` directive.
